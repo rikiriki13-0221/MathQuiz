@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>数学クイズアプリ</title>
+  <style>
+    @media (max-width: 600px) {
+      #question { font-size: 1.5rem; }
+    }
+
+    #question { overflow-x: auto; }
+    
+    .correct {
+      color: #0a0;
+      background-color: #e0ffe0;
+      padding: 1em 1.5em;
+      border-radius: 1em;
+      display: inline-block;
+      animation: pop 0.3s ease-out;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+    
+    .incorrect {
+      color: #c00;
+      background-color: #ffe0e0;
+      padding: 1em 1.5em;
+      border-radius: 1em;
+      display: inline-block;
+      animation: pop 0.3s ease-out;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+    
+    @keyframes pop {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    body {
+      font-family: sans-serif;
+      background: #f5f5ff;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .math-button {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      background: #4c6ef5;
+      color: white;
+      cursor: pointer;
+      margin: 0.5rem;
+      user-select: none;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 0 15px #ccc;
+      display: inline-block;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+    
+    input {
+      padding: 0.5rem;
+      font-size: 1rem;
+      width: 100px;
+    }
+    
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      background: #4c6ef5;
+      color: white;
+      cursor: pointer;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+    }
+    
+    #feedback {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    
+    #question {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+    
+    #note {
+      margin-top: 1rem;
+      color: #555;
+      white-space: pre-line;
+    }
+    
+    #stats {
+      margin-top: 1rem;
+      color: #333;
+    
+    }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+  <h1>🧠 数学クイズ</h1>
+
+<div id="home" class="card">
+  <h2>問題の種類を選んでね</h2>
+  <button onclick="showGroup('X')">文字を含む問題</button>
+  <button onclick="showGroup('Y')">数字のみの問題</button>
+</div>
+
+<div id="groupX" class="card" style="display:none;">
+  <h2>問題を選んでね</h2>
+  <button id="btnAdd" onclick="startQuiz('add')"></button>
+  <button id="btnSub" onclick="startQuiz('sub')"></button>
+  <button id="btnPower" onclick="startQuiz('power')"></button>
+  <br /><br />
+  <button onclick="goHome()">ホームに戻る</button>
+</div>
+
+<div id="groupY" class="card" style="display:none;">
+  <h2>問題のカテゴリを選んでね</h2>
+  <button onclick="showSubGroup('Integer')">整数の問題</button>
+  <button onclick="showSubGroup('Fraction')">分数の問題</button>
+  <button onclick="showSubGroup('Natural')">自然数の問題</button>
+  <br /><br />
+  <button onclick="goHome()">ホームに戻る</button>
+</div>
+
+<div id="groupYInteger" class="card" style="display:none;">
+  <h2>整数の問題</h2>
+  <button id="btnArithmetic" onclick="startQuiz('arithmetic')"></button>
+  <button id="btnAddZ" onclick="startQuiz('AddZ')"></button>
+  <button id="btnSubZ" onclick="startQuiz('SubZ')"></button>
+  <button id="btnMultiZ" onclick="startQuiz('MultiZ')"></button>
+  <br /><br />
+  <button onclick="document.getElementById('groupYInteger').style.display='none';document.getElementById('groupY').style.display='block';">カテゴリに戻る</button>
+</div>
+
+<div id="groupYFraction" class="card" style="display:none;">
+  <h2>分数の問題</h2>
+  <button id="btnFraction" onclick="startQuiz('fraction')"></button>
+  <br /><br />
+  <button onclick="document.getElementById('groupYFraction').style.display='none';document.getElementById('groupY').style.display='block';">カテゴリに戻る</button>
+</div>
+
+<div id="groupYNatural" class="card" style="display:none;">
+  <h2>自然数の問題</h2>
+  <button id="btnNaturalAdd" onclick="startQuiz('naturalAdd')">自然数の足し算</button>
+  <button id="btnNaturalSub" onclick="startQuiz('naturalSub')">自然数の引き算</button>
+  <button id="btnNaturalMul" onclick="startQuiz('naturalMul')">自然数のかけ算</button>
+  <button id="btnNaturalDiv" onclick="startQuiz('naturalDiv')">自然数の割り算</button>
+  <br /><br />
+  <button onclick="document.getElementById('groupYNatural').style.display='none';document.getElementById('groupY').style.display='block';">カテゴリに戻る</button>
+</div>
+
+<div id="quiz" class="card" style="display:none;">
+  <div id="question"></div>
+  <input type="text" id="answer" placeholder="？を入力" autocomplete="off" />
+  <br />
+  <button onclick="checkAnswer()">答える</button>
+  <button onclick="nextQuestion()">次の問題</button>
+  <button onclick="goHome()">ホームに戻る</button>
+  <div id="feedback"></div>
+  <div id="note" style="display:none;"></div>
+  <div id="stats"></div>
+</div>
+
+<script>
+let a, b, c, d, m, n, correctAnswer;
+let currentType = null;
+let totalAnswered = 0;
+let correctCount = 0;
+
+function setMathButtons() {
+  const groupXButtons = [
+    { id: 'btnAdd', formula: '\\( ax + bx \\)' },
+    { id: 'btnSub', formula: '\\( ax - bx \\)' },
+    { id: 'btnPower', formula: '\\( ax^{m} \\times bx^{n} \\)' },
+  ];
+  const groupYIntegerButtons = [
+    { id: 'btnAddZ', formula: '整数の足し算練習' },
+    { id: 'btnSubZ', formula: '整数の引き算練習' },
+    { id: 'btnMultiZ', formula: '整数の九九練習' },
+    { id: 'btnArithmetic', formula: '整数の四則演算' },
+  ];
+  const groupYFractionButtons = [
+    { id: 'btnFraction', formula: '分数の四則演算' },
+  ];
+  const groupYNaturalButtons = [
+    { id: 'btnNaturalAdd', formula: '自然数の足し算' },
+    { id: 'btnNaturalSub', formula: '自然数の引き算' },
+    { id: 'btnNaturalMul', formula: '自然数のかけ算' },
+    { id: 'btnNaturalDiv', formula: '自然数の割り算' },
+  ];
+  groupXButtons.forEach(({ id, formula }) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.innerHTML = formula;
+  });
+  groupYIntegerButtons.forEach(({ id, formula }) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.innerHTML = formula;
+  });
+  groupYFractionButtons.forEach(({ id, formula }) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.innerHTML = formula;
+  });
+  groupYNaturalButtons.forEach(({ id, formula }) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.innerHTML = formula;
+  });
+  MathJax.typeset();
+}
+
+function showGroup(group) {
+  document.getElementById('home').style.display = 'none';
+  if (group === 'X') {
+    document.getElementById('groupX').style.display = 'block';
+  } else if (group === 'Y') {
+    document.getElementById('groupY').style.display = 'block';
+    document.getElementById('groupYInteger').style.display = 'none';
+    document.getElementById('groupYFraction').style.display = 'none';
+    document.getElementById('groupYNatural').style.display = 'none';
+  }
+  MathJax.typeset();
+}
+
+function showSubGroup(sub) {
+  document.getElementById('groupYInteger').style.display = 'none';
+  document.getElementById('groupYFraction').style.display = 'none';
+  document.getElementById('groupYNatural').style.display = 'none';
+  if (sub === 'Integer') {
+    document.getElementById('groupY').style.display = 'none';
+    document.getElementById('groupYInteger').style.display = 'block';
+  } else if (sub === 'Fraction') {
+    document.getElementById('groupY').style.display = 'none';
+    document.getElementById('groupYFraction').style.display = 'block';
+  } else if (sub === 'Natural') {
+    document.getElementById('groupY').style.display = 'none';
+    document.getElementById('groupYNatural').style.display = 'block';
+  }
+  MathJax.typeset();
+}
+
+function getRandomNonZeroInt(min, max) {
+  let num = 0;
+  while (num === 0) {
+    num = Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  return num;
+}
+
+function gcd(x, y) {
+  return y === 0 ? Math.abs(x) : gcd(y, x % y);
+}
+
+function simplifyFraction(numer, denom) {
+  const sign = (numer * denom) < 0 ? -1 : 1;
+  numer = Math.abs(numer);
+  denom = Math.abs(denom);
+  const d = gcd(numer, denom);
+  numer = (numer / d) * sign;
+  denom = denom / d;
+  return denom === 1 ? `${numer}` : `${numer}/${denom}`;
+}
+
+function simplifyFractionLateX(numer, denom) {
+  const sign = (numer * denom) < 0 ? -1 : 1;
+  numer = Math.abs(numer);
+  denom = Math.abs(denom);
+  const d = gcd(numer, denom);
+  numer = numer / d;
+  denom = denom / d;
+  if (denom === 1) {
+    return `${sign * numer}`;
+  } else {
+    return `${sign === -1 ? '-' : ''}\\frac{${numer}}{${denom}}`;
+  }
+}
+
+function formatTerm(n) {
+  if (n === 1) return 'x';
+  if (n === -1) return '-x';
+  if (n === 0) return '0';
+  return n + 'x';
+}
+
+function formatAnswer(n) {
+  if (n === 1) return 'x';
+  if (n === -1) return '-x';
+  if (n === 0) return '0';
+  return n + 'x';
+}
+
+function formatExponent(x) {
+  return x === 1 ? '' : `^${x}`;
+}
+
+function formatPowerTerm(coef, exp) {
+  if (exp === 0) return `${coef}`;
+  let xPart = `x${formatExponent(exp)}`;
+  if (coef === 1) return `${xPart}`;
+  if (coef === -1) return `-${xPart}`;
+  return `${coef}${xPart}`;
+}
+
+function showNote(type) {
+  const note = document.getElementById('note');
+  if (type === 'fraction') {
+    note.innerHTML = `
+    ※ 答えは分数なら \\(-\\frac{3}{4}\\) のように入力してね！約分必須！<br />
+    例：<br />
+    \\( \\frac{3}{2} \\) → <code>3/2</code><br />
+    \\( -\\frac{1}{4} \\) → <code>-1/4</code><br />
+    \\( \\frac{4}{2} \\) → <code>2</code><br />
+    \\( 3 \\div (-2) \\) → <code>-3/2</code>
+    `;
+    MathJax.typeset();
+  } else if(type === 'power'){
+    note.innerHTML = `※ 答えは例のように入力してね！<br>例：<br>\\( x^2 \\) → <code>x^2</code><br>\\( -x^{3} \\) → <code>-x^3</code><br>\\( 5x \\) → <code>5x</code>`;
+    MathJax.typeset();
+  } else {
+    note.innerHTML = '※ 整数や単項式はそのまま入力してね！（例: -2x や 5）';
+  }
+  note.style.display = 'block';
+}
+
+function resetQuizUI() {
+  document.getElementById('answer').value = '';
+  const feedback = document.getElementById('feedback');
+  feedback.textContent = '';
+  feedback.style.display = 'none';
+  feedback.style.opacity = '1';
+  feedback.className = '';
+  MathJax.typeset();
+}
+
+function goHome() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('home').style.display = 'block';
+  document.getElementById('note').style.display = 'none';
+  document.getElementById('groupX').style.display = 'none';
+  document.getElementById('groupY').style.display = 'none';
+  MathJax.typeset();
+}
+
+function startQuiz(type) {
+  currentType = type;
+  document.getElementById('groupX').style.display = 'none';
+  document.getElementById('groupY').style.display = 'none';
+  document.getElementById('groupYInteger').style.display = 'none';
+  document.getElementById('groupYFraction').style.display = 'none';
+  document.getElementById('groupYNatural').style.display = 'none';
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  nextQuestion();
+}
+
+function nextQuestion() {
+  if (currentType === 'power') {
+    generatePowerQuestion();
+  } else if (currentType === 'fraction') {
+    generateFractionQuestion();
+  } else if (currentType === 'add') {
+    generateAddQuestion();
+  } else if (currentType === 'sub') {
+    generateSubQuestion();
+  } else if (currentType === 'arithmetic') {
+    generateArithmeticQuestion();
+  } else if(currentType === 'AddZ') {
+    generateAddZQuestion();
+  } else if(currentType === 'SubZ'){
+    generateSubZQuestion();
+  } else if(currentType === 'MultiZ'){
+    generateMultiZQuestion();
+  } else if(currentType === 'naturalAdd'){
+    generateNaturalAddQuestion();
+  } else if(currentType === 'naturalMul'){
+    generateNaturalMulQuestion();
+  } else if(currentType === 'naturalSub'){
+    generateNaturalSubQuestion();
+  } else if(currentType === 'naturalDiv'){
+    generateNaturalDivQuestion();
+  }
+}
+
+function checkAnswer() {
+  const userInput = document.getElementById('answer').value.trim();
+  const feedback = document.getElementById('feedback');
+  totalAnswered++;
+  feedback.className = '';
+  feedback.style.display = 'inline-block';
+  if (userInput === correctAnswer) {
+    correctCount++;
+    feedback.innerHTML = '🎉 正解！';
+    feedback.classList.add('correct');
+  } else {
+    feedback.innerHTML = `❌ 不正解… 答えは ${correctAnswer}`;
+    feedback.classList.add('incorrect');
+  }
+  document.getElementById('stats').textContent = `正解数: ${correctCount} / ${totalAnswered}`;
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      feedback.style.opacity = '0';
+      setTimeout(() => {
+        feedback.style.display = 'none';
+        feedback.style.opacity = '1';
+      }, 500);
+    }, 5000);
+  });
+}
+
+function adjustQuestionFontSize() {
+  const questionEl = document.getElementById('question');
+  const containerWidth = questionEl.parentElement.clientWidth;
+  let fontSize = 25;
+  questionEl.style.fontSize = fontSize + 'px';
+  while (questionEl.scrollWidth > containerWidth && fontSize > 12) {
+    fontSize -= 1;
+    questionEl.style.fontSize = fontSize + 'px';
+  }
+}
+
+function generateAddZQuestion(){
+  a = getRandomNonZeroInt(-9, 9);
+  b = getRandomNonZeroInt(-9, 9);
+  correctAnswer = String(a + b);
+  b = b < 0 ? `\\left(${b}\\right)` : b;
+  document.getElementById(`question`).innerHTML = `\\(${a} + ${b} = ?\\)`;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  showNote(`normal`);
+  MathJax.typeset();
+  resetQuizUI();
+}
+
+function generateSubZQuestion(){
+  a = getRandomNonZeroInt(-9, 9);
+  b = getRandomNonZeroInt(-9, 9);
+  correctAnswer = String(a - b);
+  b = b < 0 ? `\\left(${b}\\right)` : b;
+  document.getElementById(`question`).innerHTML = `\\(${a} - ${b} = ?\\)`;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  showNote(`normal`);
+  MathJax.typeset();
+  resetQuizUI();
+}
+
+function generateMultiZQuestion(){
+  a = getRandomNonZeroInt(-9, 9);
+  b = getRandomNonZeroInt(-9, 9);
+  correctAnswer = String(a * b);
+  b = b < 0 ? `\\left(${b}\\right)` : b;
+  document.getElementById(`question`).innerHTML = `\\(${a} \\times ${b} = ?\\)`;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  showNote(`normal`);
+  MathJax.typeset();
+  resetQuizUI();
+}
+
+function generateAddQuestion() {
+  a = getRandomNonZeroInt(-9, 9);
+  b = getRandomNonZeroInt(-9, 9);
+  correctAnswer = formatAnswer(a + b);
+  const bTerm = b < 0 ? `\\left(${formatTerm(b)}\\right)` : formatTerm(b);
+  document.getElementById('question').innerHTML = `\\(${formatTerm(a)} + ${bTerm} = ?\\)`;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  showNote('normal');
+  MathJax.typeset();
+  resetQuizUI();
+}
+
+function generateSubQuestion() {
+  a = getRandomNonZeroInt(-9, 9);
+  b = getRandomNonZeroInt(-9, 9);
+  correctAnswer = formatAnswer(a - b);
+  const bTerm = b < 0 ? `\\left(${formatTerm(b)}\\right)` : formatTerm(b);
+  document.getElementById('question').innerHTML = `\\(${formatTerm(a)} - ${bTerm} = ?\\)`;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  showNote('normal');
+  MathJax.typeset();
+  resetQuizUI();
+}
+
+function generateArithmeticQuestion() {
+  const ops = ['+', '-', '×', '÷'];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  a = getRandomNonZeroInt(-10, 10);
+  b = getRandomNonZeroInt(-10, 10);
+  if (op === '+') correctAnswer = String(a + b);
+  if (op === '-') correctAnswer = String(a - b);
+  if (op === '×') correctAnswer = String(a * b);
+  if (op === '÷') correctAnswer = simplifyFraction(a,b);
+  const bStr = b < 0 ? `\\left(${b}\\right)` : b;
+  document.getElementById('question').innerHTML = `\\(${a} ${op} ${bStr} = ?\\)`;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  showNote('normal');
+  MathJax.typeset();
+  resetQuizUI();
+}
+
+function generatePowerQuestion() {
+  a = getRandomNonZeroInt(-5, 5);
+  b = getRandomNonZeroInt(-5, 5);
+  m = getRandomNonZeroInt(1, 5);
+  n = getRandomNonZeroInt(1, 5);
+  const coef = a * b;
+  const exp = m + n;
+  correctAnswer = formatPowerTerm(coef, exp);
+  const left = formatPowerTerm(a, m);
+  let right = formatPowerTerm(b, n);
+  if (right.startsWith('-')) { right = `\\left(${right}\\right)`; }
+  document.getElementById('question').innerHTML = `\\(${left} \\times ${right} = ?\\)`;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  MathJax.typeset();
+  showNote('power');
+  resetQuizUI();
+}
+
+function generateFractionQuestion() {
+  const ops = ['+', '-', '×', '÷'];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  a = getRandomNonZeroInt(-10, 10);
+  b = getRandomNonZeroInt(-10, 10);
+  c = getRandomNonZeroInt(-10, 10);
+  d = getRandomNonZeroInt(-10, 10);
+  let numer, denom;
+  switch (op) {
+    case '+': numer = a * d + c * b; denom = b * d; break;
+    case '-': numer = a * d - c * b; denom = b * d; break;
+    case '×': numer = a * c; denom = b * d; break;
+    case '÷': numer = a * d; denom = b * c; break;
+  }
+  correctAnswer = simplifyFraction(numer, denom);
+  const aStr = simplifyFractionLateX(a, b);
+  const bStr = simplifyFractionLateX(c, d);
+  const bDisplay = (c * d < 0) ? `\\left(${bStr}\\right)` : `${bStr}`;
+  const questionLatex = `\\(${aStr} ${op} ${bDisplay} = ?\\)`;
+  document.getElementById('question').innerHTML = questionLatex;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  MathJax.typeset();
+  showNote('fraction');
+  resetQuizUI();
+}
+
+function generateNaturalAddQuestion() {
+  a = getRandomNonZeroInt(1, 99);
+  b = getRandomNonZeroInt(1, 99);
+  correctAnswer = String(a + b);
+  document.getElementById('question').innerHTML = `\\(${a} + ${b} = ?\\)`;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  showNote('normal');
+  MathJax.typeset();
+  resetQuizUI();
+}
+
+function generateNaturalMulQuestion() {
+  a = getRandomNonZeroInt(1, 99);
+  b = getRandomNonZeroInt(1, 99);
+  correctAnswer = String(a * b);
+  document.getElementById('question').innerHTML = `\\(${a} \\times ${b} = ?\\)`;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  showNote('normal');
+  MathJax.typeset();
+  resetQuizUI();
+}
+
+function generateNaturalSubQuestion() {
+  a = getRandomNonZeroInt(1, 99);
+  b = getRandomNonZeroInt(1, 99);
+  if (a < b) {
+    [a, b] = [b, a];
+  }
+  else if (a === b) {
+    b = getRandomNonZeroInt(1, 99);
+  }
+  correctAnswer = String(a - b);
+  document.getElementById('question').innerHTML = `\\(${a} - ${b} = ?\\)`;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  showNote('normal');
+  MathJax.typeset();
+  resetQuizUI();
+}
+
+function generateNaturalDivQuestion() {
+  a = getRandomNonZeroInt(1, 99);
+  b = getRandomNonZeroInt(2, 99);
+  while (a % b !== 0) {
+    a = getRandomNonZeroInt(1, 99);
+    b = getRandomNonZeroInt(2, 99);
+    
+  }
+  correctAnswer = String(a / b);
+  document.getElementById('question').innerHTML = `\\(${a} \\div ${b} = ?\\)`;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  showNote('normal');
+  MathJax.typeset();
+  resetQuizUI();
+}
+
+setMathButtons();
+
+</script>
+</body>
+</html>

@@ -108,6 +108,32 @@
       color: #333;
     
     }
+    #math-keyboard {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    }
+
+  #math-keyboard button {
+    flex: 1 0 20%;
+    padding: 12px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #f8f8f8;
+    cursor: pointer;
+    transition: background 0.2s;  
+    user-select: none;
+    }
+
+  #math-keyboard button:hover {
+    background: #e0e0e0;
+    }
+
+  button{
+    touch-action : manipulation;
+  }
   </style>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -171,6 +197,14 @@
   <div id="question"></div>
   <input type="text" id="answer" placeholder="？を入力" autocomplete="off" />
   <br />
+  <div id="math-keyboard">
+    <button onclick="insertSymbol('^')">^</button>
+    <button onclick="insertSymbol('/')">/</button>
+    <button onclick="insertSymbol('+')">+</button>
+    <button onclick="insertSymbol('-')">-</button>
+    <button onclick="insertSymbol('(')">(</button>
+    <button onclick="insertSymbol(')')">)</button>
+  </div>
   <button onclick="checkAnswer()">答える</button>
   <button onclick="nextQuestion()">次の問題</button>
   <button onclick="goHome()">ホームに戻る</button>
@@ -179,11 +213,22 @@
   <div id="stats"></div>
 </div>
 
+
+
 <script>
 let a, b, c, d, m, n, correctAnswer;
 let currentType = null;
 let totalAnswered = 0;
 let correctCount = 0;
+
+function insertSymbol(symbol) {
+  const input = document.getElementById("answer");
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+  input.value = input.value.slice(0, start) + symbol + input.value.slice(end);
+  input.setSelectionRange(start + symbol.length, start + symbol.length);
+  input.focus();
+}
 
 function setMathButtons() {
   const groupXButtons = [

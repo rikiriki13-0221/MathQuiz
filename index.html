@@ -213,9 +213,10 @@
     <button onclick="insertSymbol('/')">/</button>
     <button onclick="insertSymbol('+')">+</button>
     <button onclick="insertSymbol('-')">-</button>
+    <button onclick="insertSymbol('x')">x</button>
     <button onclick="insertSymbol('(')">(</button>
     <button onclick="insertSymbol(')')">)</button>
-    <button onclick="insertSymbol('x')">x</button>
+    <button onclick="backspaceAnswer()">⌫</button>
   </div>
   <button onclick="checkAnswer()">答える</button>
   <button onclick="nextQuestion()">次の問題</button>
@@ -238,6 +239,20 @@ function insertSymbol(symbol) {
   const start = input.selectionStart;
   const end = input.selectionEnd;
   input.setRangeText(symbol, start, end, 'end');
+  input.focus();
+}
+
+function backspaceAnswer() {
+  const input = document.getElementById("answer");
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+  if (start === end && start > 0) {
+    // カーソル位置の1文字前を消す
+    input.setRangeText('', start - 1, start, 'end');
+  } else {
+    // 選択範囲を消す
+    input.setRangeText('', start, end, 'end');
+  }
   input.focus();
 }
 
@@ -671,4 +686,3 @@ setMathButtons();
 </script>
 </body>
 </html>
-

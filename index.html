@@ -640,8 +640,8 @@ function generateFractionQuestion() {
 
 function generateReduceFractionQuestion() {
   do {
-    a = getRandomNonZeroInt(1, 20);
-    b = getRandomNonZeroInt(1, 20);
+    a = getRandomNonZeroInt(2, 20);
+    b = getRandomNonZeroInt(2, 20);
   } while (simplifyFraction(a, b) === `${a}/${b}`);
   correctAnswer = simplifyFraction(a, b);
   document.getElementById('question').innerHTML = `\\( \\frac{${a}}{${b}} = ? \\)`;
@@ -711,3 +711,4 @@ setMathButtons();
 </script>
 </body>
 </html>
+

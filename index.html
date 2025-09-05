@@ -227,7 +227,6 @@ function insertSymbol(symbol) {
   const input = document.getElementById("answer");
   const start = input.selectionStart;
   const end = input.selectionEnd;
-  input.value = input.value.slice(0, start) + symbol + input.value.slice(end);
   input.setRangeText(symbol, start, end, 'end');
   input.focus();
 }
@@ -662,3 +661,4 @@ setMathButtons();
 </script>
 </body>
 </html>
+

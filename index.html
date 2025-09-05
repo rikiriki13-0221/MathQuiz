@@ -169,17 +169,18 @@
 
 <div id="groupYInteger" class="card" style="display:none;">
   <h2>整数の問題</h2>
-  <button id="btnArithmetic" onclick="startQuiz('arithmetic')"></button>
-  <button id="btnAddZ" onclick="startQuiz('AddZ')"></button>
-  <button id="btnSubZ" onclick="startQuiz('SubZ')"></button>
-  <button id="btnMultiZ" onclick="startQuiz('MultiZ')"></button>
+  <button id="btnArithmetic" onclick="startQuiz('arithmetic')">整数の四則演算</button>
+  <button id="btnAddZ" onclick="startQuiz('AddZ')">整数の足し算練習</button>
+  <button id="btnSubZ" onclick="startQuiz('SubZ')">整数の引き算練習</button>
+  <button id="btnMultiZ" onclick="startQuiz('MultiZ')">整数の九九練習</button>
   <br /><br />
   <button onclick="document.getElementById('groupYInteger').style.display='none';document.getElementById('groupY').style.display='block';">カテゴリに戻る</button>
 </div>
 
 <div id="groupYFraction" class="card" style="display:none;">
   <h2>分数の問題</h2>
-  <button id="btnFraction" onclick="startQuiz('fraction')"></button>
+  <button id="btnFraction" onclick="startQuiz('fraction')">分数の四則演算</button>
+  <button id="btnReduceFraction" onclick="startQuiz('reduceFraction')">分数の約分</button>
   <br /><br />
   <button onclick="document.getElementById('groupYFraction').style.display='none';document.getElementById('groupY').style.display='block';">カテゴリに戻る</button>
 </div>
@@ -270,6 +271,7 @@ function setMathButtons() {
   ];
   const groupYFractionButtons = [
     { id: 'btnFraction', formula: '分数の四則演算' },
+    { id: 'btnReduceFraction', formula: '分数の約分' },
   ];
   const groupYNaturalButtons = [
     { id: 'btnNaturalAdd', formula: '自然数の足し算' },
@@ -400,6 +402,14 @@ function showNote(type) {
     \\( 3 \\div (-2) \\) → <code>-3/2</code>
     `;
     MathJax.typeset();
+  } else if(type === 'reduceFraction'){
+    note.innerHTML = `
+    ※ 問題を約分して \\( \\frac{3}{4}\\) のように入力してね！<br />
+    例：<br />
+    \\( \\frac{6}{4} \\) → <code>3/2</code><br />
+    \\( \\frac{4}{2} \\) → <code>2</code><br />
+    `;
+    MathJax.typeset();
   } else if(type === 'power'){
     note.innerHTML = `※ 答えは例のように入力してね！<br>例：<br>\\( x^2 \\) → <code>x^2</code><br>\\( -x^{3} \\) → <code>-x^3</code><br>\\( 5x \\) → <code>5x</code>`;
     MathJax.typeset();
@@ -445,6 +455,8 @@ function nextQuestion() {
     generatePowerQuestion();
   } else if (currentType === 'fraction') {
     generateFractionQuestion();
+  } else if (currentType === 'reduceFraction') {
+    generateReduceFractionQuestion();
   } else if (currentType === 'add') {
     generateAddQuestion();
   } else if (currentType === 'sub') {
@@ -625,6 +637,19 @@ function generateFractionQuestion() {
   showNote('fraction');
   resetQuizUI();
 }
+
+function generateReduceFractionQuestion() {
+  do {
+    a = getRandomNonZeroInt(1, 20);
+    b = getRandomNonZeroInt(1, 20);
+  } while (simplifyFraction(a, b) === `${a}/${b}`);
+  correctAnswer = simplifyFraction(a, b);
+  document.getElementById('question').innerHTML = `\\( \\frac{${a}}{${b}} = ? \\)`;
+  if (window.innerWidth <= 480) { adjustQuestionFontSize(); }
+  MathJax.typeset();
+  showNote('reduceFraction');
+  resetQuizUI();
+  }  
 
 function generateNaturalAddQuestion() {
   a = getRandomNonZeroInt(1, 99);

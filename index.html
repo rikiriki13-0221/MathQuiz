@@ -112,12 +112,12 @@
     margin-top: 10px;
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    gap: 2.5px;
     }
 
   #math-keyboard button {
     flex: 1 0 20%;
-    padding: 12px;
+    padding: 9px;
     font-size: 18px;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -199,6 +199,16 @@
   <input type="text" id="answer" placeholder="？を入力" autocomplete="off" />
   <br />
   <div id="math-keyboard">
+    <button onclick="insertSymbol('1')">1</button>
+    <button onclick="insertSymbol('2')">2</button>
+    <button onclick="insertSymbol('3')">3</button>
+    <button onclick="insertSymbol('4')">4</button>
+    <button onclick="insertSymbol('5')">5</button>
+    <button onclick="insertSymbol('6')">6</button>
+    <button onclick="insertSymbol('7')">7</button>
+    <button onclick="insertSymbol('8')">8</button>
+    <button onclick="insertSymbol('9')">9</button>
+    <button onclick="insertSymbol('0')">0</button>
     <button onclick="insertSymbol('^')">^</button>
     <button onclick="insertSymbol('/')">/</button>
     <button onclick="insertSymbol('+')">+</button>
@@ -661,4 +671,3 @@ setMathButtons();
 </script>
 </body>
 </html>
-
